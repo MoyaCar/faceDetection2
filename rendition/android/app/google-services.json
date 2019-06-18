@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "845916945071",
+    "firebase_url": "https://flutter-cd9a9.firebaseio.com",
+    "project_id": "flutter-cd9a9",
+    "storage_bucket": "flutter-cd9a9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:845916945071:android:1ff1d1149bfa9f8a",
+        "android_client_info": {
+          "package_name": "com.example.rendition"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "845916945071-haavu8uda3nk7fjr8dg0kgti4qqq1qps.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuoaBp2506WCjQ9QP58N6N0FtDrY5S-Jk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "845916945071-haavu8uda3nk7fjr8dg0kgti4qqq1qps.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

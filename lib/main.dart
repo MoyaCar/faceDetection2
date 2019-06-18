@@ -35,7 +35,7 @@ class HomeWidgetState extends State<HomeWidget> {
     final faceDetector = FirebaseVision.instance.faceDetector(
       FaceDetectorOptions(mode: FaceDetectorMode.accurate),
     );
-    final faces = await faceDetector.processImage(image);
+    final faces = await faceDetector.detectInImage(image);
     if (mounted) {
       setState(() {
         _imageFile = imageFile;

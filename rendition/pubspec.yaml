@@ -1,4 +1,4 @@
-name: database_flutter
+name: rendition
 description: A new Flutter project.
 
 # The following defines the version and build number for your application.
@@ -17,12 +17,12 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
-  image_picker: ^0.4.12
-  firebase_ml_vision: ^0.2.1
-  cloud_firestore: ^0.7.4
+  
   flutter:
     sdk: flutter
 
+  firebase_ml_vision: ^0.2.1
+  image_picker: ^0.4.12
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
