@@ -17,6 +17,7 @@ environment:
   sdk: ">=2.1.0 <3.0.0"
 
 dependencies:
+  image: ^2.1.4
   image_picker: ^0.4.12
   firebase_ml_vision: ^0.2.1
   cloud_firestore: ^0.7.4
