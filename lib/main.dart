@@ -32,30 +32,44 @@ class HomeWidgetState extends State<HomeWidget> {
   File _imageFile;
   List<Face> _faces;
   Image imageresized;
+
+
+  // Metodo a cargo de tomar la foto y de detectar los rostros en la imagen.
   void _getAndDetectFaces() async {
+
+    //Image picker toma una imagen desde la galería(se puede cambiar a camara) y le asigna tamaño maximo para voler
+    //el procesado más certero.
     final imageFilex = await ImagePicker.pickImage(
       source: ImageSource.gallery,
       maxHeight: 320,
       maxWidth: 320,
     );
 
+    //Envía la imagen a la IA engargada de detectar los rostros
     final image = FirebaseVisionImage.fromFile(imageFilex);
 
+    //Implementa FaceDetector a la imagen
     final faceDetector = FirebaseVision.instance.faceDetector(
       FaceDetectorOptions(mode: FaceDetectorMode.accurate),
     );
+
+    // Devuelve una lista de rostros detectados en la imagen.
     final facesx = await faceDetector.detectInImage(image);
+
+    // Refresca la aplicacion con la lista 
     if (mounted) {
       setState(() {
         _imageFile = imageFilex;
         _faces = facesx;
       });
     }
+    // Envia la aplicacion a la vista con la imagen procesada. 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return ImagesAndFaces(imageFile: _imageFile, faces: _faces);
     }));
   }
 
+// Vista inicial con un botón flotante que inicia el procesador
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,6 +85,7 @@ class HomeWidgetState extends State<HomeWidget> {
   }
 }
 
+// Vista de destino con la imagen Procesada y la Lista de rostros
 class ImagesAndFaces extends StatelessWidget {
   final File imageFile;
   final List<Face> faces;
@@ -79,18 +94,24 @@ class ImagesAndFaces extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //variable para conseguir las posiciones del primer rostro
     final pos = faces[0].boundingBox;
     return Scaffold(
       body: Stack(
         children: <Widget>[
+          
           Image.file(
             imageFile,
          
           ),
+          //Texto referencial con posición izquierda del rostro.
+          
           Text(
             '${pos.left.toDouble()}',
             style: TextStyle(fontSize: 30),
           ),
+
+          //Bloque que dibuja recuadro censurador de rostros.
           Positioned(
             left: pos.left.toDouble(),
             top: pos.top.toDouble(),
@@ -124,20 +145,6 @@ class ImagesAndFaces extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-}
-
-class FaceCoordinates extends StatelessWidget {
-  final Face face;
-
-  const FaceCoordinates({Key key, this.face}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final pos = face.boundingBox;
-    return ListTile(
-      title: Text('(${pos.top},${pos.left},${pos.right},${pos.bottom})'),
     );
   }
 }
