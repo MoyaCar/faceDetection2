@@ -16,7 +16,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(canvasColor: Colors.grey.withOpacity(0.1)),
+      theme: ThemeData(
+        canvasColor: Colors.grey.withOpacity(0.1),
+        textTheme: TextTheme(
+          body1: TextStyle(color: Colors.white30),
+        ),
+      ),
       home: HomeWidget(),
     );
   }
@@ -104,75 +109,111 @@ class ImageAndFacesState extends State<ImageAndFaces> {
   ScreenshotController screenShootController = ScreenshotController();
   final File imageFile;
   final List<Face> faces;
-double valor = 1;
-  ImageAndFacesState(this.imageFile, this.faces);
 
+  double blurvalor = 2.0;
+  ImageAndFacesState(this.imageFile, this.faces);
+  bool imagenColocada = false;
   @override
   Widget build(BuildContext context) {
     //variable para conseguir las posiciones del primer rostro
-    final pos = faces[0].boundingBox;
-    final anchoDeCara = pos.right.toDouble() - pos.left.toDouble();
-    final altoDeCara = pos.bottom.toDouble() - pos.top.toDouble();
-    
+
     return Scaffold(
       drawer: Drawer(
-          child: Column(
-        children: <Widget>[
-          DrawerHeader(
-            child: Column(
-              children: <Widget>[
-                Container(
-                  color: Colors.black.withOpacity(0.2),
-                  child: Text(
-                    'MENU',
-                    style: TextStyle(color: fuenteBlanca),
+        child: Column(
+          children: <Widget>[
+            DrawerHeader(
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    color: Colors.black.withOpacity(0.2),
+                    child: Text(
+                      'MENU',
+                      style: TextStyle(color: fuenteBlanca),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Slider(
-            
-            max: 10.0,
-            min: 1.0,
-            value: valor,
-            onChanged: (nuevovalor) {
-              setState(() {
-                valor = nuevovalor;
-                print('valor: $valor');
-              });
-            },
-          ),
-        ],
-      )),
+            Text('Nivel de Borrado'),
+            Slider(
+              activeColor: Colors.grey.withOpacity(0.60),
+              inactiveColor: Colors.grey.withOpacity(0.60),
+              max: 4.0,
+              min: 0.0,
+              value: blurvalor,
+              onChanged: (nuevoBlurvalor) {
+                setState(() {
+                  blurvalor = nuevoBlurvalor;
+                  imagenColocada = false;
+                  print('valor: $blurvalor');
+                });
+              },
+            ),
+          ],
+        ),
+      ),
       body: Center(
         child: Stack(
-          children: <Widget>[
+          children: List.generate(faces.length + 1, (index) {
+            if (!imagenColocada) {
+              imagenColocada = true;
+              return Image.file(
+                imageFile,
+              );
+            } else {
+              final pos = faces[index -1].boundingBox;
+              final anchoDeCara = pos.right.toDouble() - pos.left.toDouble();
+              final altoDeCara = pos.bottom.toDouble() - pos.top.toDouble();
+              return Positioned(
+                left: pos.left.toDouble(),
+                top: pos.top.toDouble() * 0.90,
+                child: Container(
+                  width: anchoDeCara,
+                  height: altoDeCara * 1.18,
+                  child: Stack(
+                    children: <Widget>[
+                      Center(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(25.0),
+                          child: BackdropFilter(
+                            filter: prefix0.ImageFilter.blur(
+                                sigmaX: blurvalor, sigmaY: blurvalor),
+                            child: new Container(
+                              width: 100,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200.withOpacity(0),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
+          }),
+          /*  children: <Widget>[
             Image.file(
               imageFile,
-            ),
-            //Texto referencial con posición izquierda del rostro.
-
-            Text(
-              '${pos.left.toDouble()} \n ${pos.right.toDouble()} \n ${pos.top.toDouble()} \n ${pos.bottom.toDouble()}',
-              style: TextStyle(fontSize: 30),
             ),
 
             //Bloque que dibuja recuadro censurador de rostros.
             Positioned(
               left: pos.left.toDouble(),
-              top: pos.top.toDouble(),
+              top: pos.top.toDouble() * 0.90,
               child: Container(
                 width: anchoDeCara,
-                height: altoDeCara,
+                height: altoDeCara * 1.18,
                 child: Stack(
                   children: <Widget>[
                     Center(
                       child: ClipRRect(
-                        borderRadius: BorderRadius.circular(15.0),
+                        borderRadius: BorderRadius.circular(25.0),
                         child: BackdropFilter(
                           filter: prefix0.ImageFilter.blur(
-                              sigmaX: 4.0, sigmaY: 4.0),
+                              sigmaX: blurvalor, sigmaY: blurvalor),
                           child: new Container(
                             width: 100,
                             height: 100,
@@ -187,12 +228,8 @@ double valor = 1;
                 ),
               ),
             ),
-          ],
+          ], */
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(Icons.share),
       ),
     );
   }
