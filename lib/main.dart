@@ -7,13 +7,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_ml_vision/firebase_ml_vision.dart';
 import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+
+Color fuenteBlanca = Colors.white.withOpacity(0.6);
+
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(canvasColor: Colors.grey.withOpacity(0.1)),
       home: HomeWidget(),
     );
   }
@@ -64,7 +67,7 @@ class HomeWidgetState extends State<HomeWidget> {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return _faces.isEmpty
           ? NoImage()
-          : ImagesAndFaces(imageFile: _imageFile, faces: _faces);
+          : ImageAndFaces(imageFile: _imageFile, faces: _faces);
     }));
   }
 
@@ -84,85 +87,111 @@ class HomeWidgetState extends State<HomeWidget> {
   }
 }
 
-// Vista de destino con la imagen Procesada y la Lista de rostros
-class ImagesAndFaces extends StatelessWidget {
+class ImageAndFaces extends StatefulWidget {
   final File imageFile;
   final List<Face> faces;
 
-  const ImagesAndFaces({Key key, this.imageFile, this.faces}) : super(key: key);
+  const ImageAndFaces({Key key, this.imageFile, this.faces}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return ImageAndFacesState(imageFile, faces);
+  }
+}
+
+// Vista de destino con la imagen Procesada y la Lista de rostros
+class ImageAndFacesState extends State<ImageAndFaces> {
+  ScreenshotController screenShootController = ScreenshotController();
+  final File imageFile;
+  final List<Face> faces;
+double valor = 1;
+  ImageAndFacesState(this.imageFile, this.faces);
 
   @override
   Widget build(BuildContext context) {
-    File screenshot;
-    ScreenshotController screenShootController = ScreenshotController();
     //variable para conseguir las posiciones del primer rostro
     final pos = faces[0].boundingBox;
     final anchoDeCara = pos.right.toDouble() - pos.left.toDouble();
     final altoDeCara = pos.bottom.toDouble() - pos.top.toDouble();
-
+    
     return Scaffold(
-      body: Screenshot(
-        controller: screenShootController,
-        child: Center(
-          child: Stack(
-            children: <Widget>[
-              Image.file(
-                imageFile,
-              ),
-              //Texto referencial con posición izquierda del rostro.
+      drawer: Drawer(
+          child: Column(
+        children: <Widget>[
+          DrawerHeader(
+            child: Column(
+              children: <Widget>[
+                Container(
+                  color: Colors.black.withOpacity(0.2),
+                  child: Text(
+                    'MENU',
+                    style: TextStyle(color: fuenteBlanca),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Slider(
+            
+            max: 10.0,
+            min: 1.0,
+            value: valor,
+            onChanged: (nuevovalor) {
+              setState(() {
+                valor = nuevovalor;
+                print('valor: $valor');
+              });
+            },
+          ),
+        ],
+      )),
+      body: Center(
+        child: Stack(
+          children: <Widget>[
+            Image.file(
+              imageFile,
+            ),
+            //Texto referencial con posición izquierda del rostro.
 
-              Text(
-                '${pos.left.toDouble()} \n ${pos.right.toDouble()} \n ${pos.top.toDouble()} \n ${pos.bottom.toDouble()}',
-                style: TextStyle(fontSize: 30),
-              ),
+            Text(
+              '${pos.left.toDouble()} \n ${pos.right.toDouble()} \n ${pos.top.toDouble()} \n ${pos.bottom.toDouble()}',
+              style: TextStyle(fontSize: 30),
+            ),
 
-              //Bloque que dibuja recuadro censurador de rostros.
-              Positioned(
-                left: pos.left.toDouble(),
-                top: pos.top.toDouble(),
-                child: Container(
-                  width: anchoDeCara,
-                  height: altoDeCara,
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(15.0),
-                          child: BackdropFilter(
-                            filter: prefix0.ImageFilter.blur(
-                                sigmaX: 4.0, sigmaY: 4.0),
-                            child: new Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                  color: Colors.grey.shade200.withOpacity(0)),
-                              child: Center(
-                                child: Text('Blured',
-                                    style: TextStyle(
-                                        color: Colors.white.withOpacity(0.5),
-                                        fontSize: 12)),
-                              ),
+            //Bloque que dibuja recuadro censurador de rostros.
+            Positioned(
+              left: pos.left.toDouble(),
+              top: pos.top.toDouble(),
+              child: Container(
+                width: anchoDeCara,
+                height: altoDeCara,
+                child: Stack(
+                  children: <Widget>[
+                    Center(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(15.0),
+                        child: BackdropFilter(
+                          filter: prefix0.ImageFilter.blur(
+                              sigmaX: 4.0, sigmaY: 4.0),
+                          child: new Container(
+                            width: 100,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200.withOpacity(0),
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
-          screenShootController.capture().then((File image) async{
-            screenshot = image;
-            final result =
-                await ImageGallerySaver.save(image.readAsBytesSync()); 
-            print("File Saved to Gallery");
-          });
-        },
+        onPressed: () {},
         child: Icon(Icons.share),
       ),
     );
