@@ -47,8 +47,8 @@ class HomeWidgetState extends State<HomeWidget> {
     //el procesado más certero.
     final imageFilex = await ImagePicker.pickImage(
       source: ImageSource.gallery,
-      maxHeight: 320,
-      maxWidth: 320,
+      maxHeight: 640,
+      maxWidth: 400,
     );
 
     //Envía la imagen a la IA engargada de detectar los rostros
@@ -77,13 +77,14 @@ class HomeWidgetState extends State<HomeWidget> {
     }));
   }
 
-// Vista inicial con un botón flotante que inicia el procesador
+// Vista inicial con un botón flotante que inicia el procesado
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        width: 320,
-        height: 640,
+        height: double.infinity,
+        width: double.infinity,
+        color: Colors.white,
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.photo_camera),
@@ -165,83 +166,57 @@ class ImageAndFacesState extends State<ImageAndFaces> {
               );
             }
           }),
-
-          /*   children: <Widget>[
-            DrawerHeader(
-              child: Column(
-                children: <Widget>[
-                  Container(
-                    color: Colors.black.withOpacity(0.2),
-                    child: Text(
-                      'MENU',
-                      style: TextStyle(color: fuenteBlanca),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Text('Nivel de Borrado'),
-            Slider(
-              activeColor: Colors.grey.withOpacity(0.60),
-              inactiveColor: Colors.grey.withOpacity(0.60),
-              max: 4.0,
-              min: 0.0,
-              value: blurvalor,
-              onChanged: (nuevoBlurvalor) {
-                setState(() {
-                  blurvalor = nuevoBlurvalor;
-                  imagenColocada = false;
-                  print('valor: $blurvalor');
-                });
-              },
-            ),
-          ], */
         ),
       ),
-      body: Center(
-        child: Stack(
-          children: List.generate(faces.length + 1, (index) {
-            if (!imagenColocada) {
-              imagenColocada = true;
-              return Image.file(
-                imageFile,
-              );
-            } else {
-              final pos = faces[index - 1].boundingBox;
-              final anchoDeCara = pos.right.toDouble() - pos.left.toDouble();
-              final altoDeCara = pos.bottom.toDouble() - pos.top.toDouble();
-              return Positioned(
-                key: Key('$index'),
-                left: pos.left.toDouble(),
-                top: pos.top.toDouble() * 0.90,
-                child: Container(
-                  width: anchoDeCara,
-                  height: altoDeCara * 1.18,
-                  child: Stack(
-                    children: <Widget>[
-                      Center(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(25.0),
-                          child: BackdropFilter(
-                            filter: prefix0.ImageFilter.blur(
-                                sigmaX: blurValors[index],
-                                sigmaY: blurValors[index]),
-                            child: new Container(
-                              width: 100,
-                              height: 100,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade200.withOpacity(0),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.white,
+              child: Center(
+          child: Stack(
+            children: List.generate(faces.length + 1, (index) {
+              if (!imagenColocada) {
+                imagenColocada = true;
+                return Image.file(
+                  imageFile,
+                );
+              } else {
+                final pos = faces[index - 1].boundingBox;
+                final anchoDeCara = pos.right.toDouble() - pos.left.toDouble();
+                final altoDeCara = pos.bottom.toDouble() - pos.top.toDouble();
+                return Positioned(
+                  key: Key('$index'),
+                  left: pos.left.toDouble()* 0.85,
+                  top: pos.top.toDouble() * 0.8,
+                  child: Container(
+                    width: anchoDeCara,
+                    height: altoDeCara * 1.18,
+                    child: Stack(
+                      children: <Widget>[
+                        Center(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(25.0),
+                            child: BackdropFilter(
+                              filter: prefix0.ImageFilter.blur(
+                                  sigmaX: blurValors[index],
+                                  sigmaY: blurValors[index]),
+                              child: new Container(
+                                width: 100,
+                                height: 100,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade200.withOpacity(0),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }
-          }),
+                );
+              }
+            }),
+          ),
         ),
       ),
     );
