@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:ui' as prefix0;
 
@@ -110,17 +111,62 @@ class ImageAndFacesState extends State<ImageAndFaces> {
   final File imageFile;
   final List<Face> faces;
 
+  List<double> blurValors = [2.0];
+  void contarRostros() {
+    if (!valoresInicialesAgregados) {
+      for (var i = 0; i < faces.length; i++) {
+        blurValors.add(2.0);
+      }
+      print('ACAAAAA!!!: $blurValors');
+      valoresInicialesAgregados = true;
+    }
+  }
+
   double blurvalor = 2.0;
   ImageAndFacesState(this.imageFile, this.faces);
+  bool valoresInicialesAgregados = false;
   bool imagenColocada = false;
+  bool drawerColocado = false;
   @override
   Widget build(BuildContext context) {
+    contarRostros();
     //variable para conseguir las posiciones del primer rostro
 
     return Scaffold(
       drawer: Drawer(
         child: Column(
-          children: <Widget>[
+          children: List.generate(faces.length + 1, (index) {
+            if (!drawerColocado) {
+              drawerColocado = true;
+              return DrawerHeader(
+                child: Container(
+                  child: Text(
+                    'MENU',
+                    style: TextStyle(color: fuenteBlanca),
+                  ),
+                ),
+              );
+            } else {
+              return Slider(
+                key: Key('$index'),
+                activeColor: Colors.grey.withOpacity(0.60),
+                inactiveColor: Colors.grey.withOpacity(0.60),
+                max: 4.0,
+                min: 0.0,
+                value: blurValors[index],
+                onChanged: (nuevoBlurvalor) {
+                  setState(() {
+                    blurValors[index] = nuevoBlurvalor;
+                    imagenColocada = false;
+                    drawerColocado = false;
+                    print('valor: ${blurValors[index]}');
+                  });
+                },
+              );
+            }
+          }),
+
+          /*   children: <Widget>[
             DrawerHeader(
               child: Column(
                 children: <Widget>[
@@ -149,7 +195,7 @@ class ImageAndFacesState extends State<ImageAndFaces> {
                 });
               },
             ),
-          ],
+          ], */
         ),
       ),
       body: Center(
@@ -161,10 +207,11 @@ class ImageAndFacesState extends State<ImageAndFaces> {
                 imageFile,
               );
             } else {
-              final pos = faces[index -1].boundingBox;
+              final pos = faces[index - 1].boundingBox;
               final anchoDeCara = pos.right.toDouble() - pos.left.toDouble();
               final altoDeCara = pos.bottom.toDouble() - pos.top.toDouble();
               return Positioned(
+                key: Key('$index'),
                 left: pos.left.toDouble(),
                 top: pos.top.toDouble() * 0.90,
                 child: Container(
@@ -177,7 +224,8 @@ class ImageAndFacesState extends State<ImageAndFaces> {
                           borderRadius: BorderRadius.circular(25.0),
                           child: BackdropFilter(
                             filter: prefix0.ImageFilter.blur(
-                                sigmaX: blurvalor, sigmaY: blurvalor),
+                                sigmaX: blurValors[index],
+                                sigmaY: blurValors[index]),
                             child: new Container(
                               width: 100,
                               height: 100,
@@ -194,41 +242,6 @@ class ImageAndFacesState extends State<ImageAndFaces> {
               );
             }
           }),
-          /*  children: <Widget>[
-            Image.file(
-              imageFile,
-            ),
-
-            //Bloque que dibuja recuadro censurador de rostros.
-            Positioned(
-              left: pos.left.toDouble(),
-              top: pos.top.toDouble() * 0.90,
-              child: Container(
-                width: anchoDeCara,
-                height: altoDeCara * 1.18,
-                child: Stack(
-                  children: <Widget>[
-                    Center(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(25.0),
-                        child: BackdropFilter(
-                          filter: prefix0.ImageFilter.blur(
-                              sigmaX: blurvalor, sigmaY: blurvalor),
-                          child: new Container(
-                            width: 100,
-                            height: 100,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200.withOpacity(0),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ], */
         ),
       ),
     );
