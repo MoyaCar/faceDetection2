@@ -10,6 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:screenshot/screenshot.dart';
 
 Color fuenteBlanca = Colors.white.withOpacity(0.6);
+Color colorFuentePrincipal = Color(0xfffd5523).withOpacity(0.65);
+Color colorFuenteSecundario = Color(0xfff37966f).withOpacity(0.7) ;
+Color colorFondo = Color(0xfffffbe6);
 
 void main() => runApp(MyApp());
 
@@ -18,9 +21,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
+        fontFamily: 'DancingScript',
         canvasColor: Colors.grey.withOpacity(0.1),
         textTheme: TextTheme(
-          body1: TextStyle(color: Colors.white30),
+          body1: TextStyle(
+            color: Color(0xfffd5523).withOpacity(0.65),
+          ),
         ),
       ),
       home: HomeWidget(),
@@ -84,10 +90,34 @@ class HomeWidgetState extends State<HomeWidget> {
       body: Container(
         height: double.infinity,
         width: double.infinity,
-        color: Colors.white,
+        color: Color(0xfffffbe6),
+        child: Center(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Blured',
+              style: TextStyle(fontSize: 64),
+            ),
+            Container(
+              width: 260,
+              padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+              child: Text(
+                'Una forma simple para difuminar rostros en fotografias',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  color:colorFuenteSecundario,
+                ),
+              ),
+            )
+          ],
+        )),
       ),
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.photo_camera),
+        backgroundColor: colorFuentePrincipal.withOpacity(0.7),
+        child: Icon(Icons.image,color: colorFondo ,),
         onPressed: _getAndDetectFaces,
       ),
     );
@@ -172,7 +202,7 @@ class ImageAndFacesState extends State<ImageAndFaces> {
         width: double.infinity,
         height: double.infinity,
         color: Colors.white,
-              child: Center(
+        child: Center(
           child: Stack(
             children: List.generate(faces.length + 1, (index) {
               if (!imagenColocada) {
@@ -186,7 +216,7 @@ class ImageAndFacesState extends State<ImageAndFaces> {
                 final altoDeCara = pos.bottom.toDouble() - pos.top.toDouble();
                 return Positioned(
                   key: Key('$index'),
-                  left: pos.left.toDouble()* 0.85,
+                  left: pos.left.toDouble() * 0.85,
                   top: pos.top.toDouble() * 0.8,
                   child: Container(
                     width: anchoDeCara,
