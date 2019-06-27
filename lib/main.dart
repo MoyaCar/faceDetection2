@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         fontFamily: 'DancingScript',
-        canvasColor: Colors.grey.withOpacity(0.1),
+        canvasColor: colorFondo.withOpacity(0.3),
         textTheme: TextTheme(
           body1: TextStyle(
             color: Color(0xfffd5523).withOpacity(0.65),
@@ -173,7 +173,7 @@ class ImageAndFacesState extends State<ImageAndFaces> {
                 child: Container(
                   child: Text(
                     'MENU',
-                    style: TextStyle(color: fuenteBlanca),
+                    style: TextStyle(color: colorFuenteSecundario),
                   ),
                 ),
               );
@@ -201,7 +201,7 @@ class ImageAndFacesState extends State<ImageAndFaces> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: Colors.white,
+        color:colorFondo,
         child: Center(
           child: Stack(
             children: List.generate(faces.length + 1, (index) {
