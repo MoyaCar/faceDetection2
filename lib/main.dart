@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'dart:ui' as prefix0;
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,7 +12,7 @@ import 'package:screenshot/screenshot.dart';
 
 Color fuenteBlanca = Colors.white.withOpacity(0.6);
 Color colorFuentePrincipal = Color(0xfffd5523).withOpacity(0.65);
-Color colorFuenteSecundario = Color(0xfff37966f).withOpacity(0.7) ;
+Color colorFuenteSecundario = Color(0xfff37966f).withOpacity(0.7);
 Color colorFondo = Color(0xfffffbe6);
 
 void main() => runApp(MyApp());
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         fontFamily: 'DancingScript',
-        canvasColor: colorFondo.withOpacity(0.3),
+        canvasColor: colorFuentePrincipal.withOpacity(0.08),
         textTheme: TextTheme(
           body1: TextStyle(
             color: Color(0xfffd5523).withOpacity(0.65),
@@ -53,8 +54,8 @@ class HomeWidgetState extends State<HomeWidget> {
     //el procesado más certero.
     final imageFilex = await ImagePicker.pickImage(
       source: ImageSource.gallery,
-      maxHeight: 640,
-      maxWidth: 400,
+      maxHeight: 576,
+      maxWidth: 432,
     );
 
     //Envía la imagen a la IA engargada de detectar los rostros
@@ -108,7 +109,7 @@ class HomeWidgetState extends State<HomeWidget> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
-                  color:colorFuenteSecundario,
+                  color: colorFuenteSecundario,
                 ),
               ),
             )
@@ -117,7 +118,10 @@ class HomeWidgetState extends State<HomeWidget> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: colorFuentePrincipal.withOpacity(0.7),
-        child: Icon(Icons.image,color: colorFondo ,),
+        child: Icon(
+          Icons.image,
+          color: colorFondo,
+        ),
         onPressed: _getAndDetectFaces,
       ),
     );
@@ -165,87 +169,118 @@ class ImageAndFacesState extends State<ImageAndFaces> {
 
     return Scaffold(
       drawer: Drawer(
-        child: Column(
+        elevation: 20,
+        child: ListView(
           children: List.generate(faces.length + 1, (index) {
             if (!drawerColocado) {
               drawerColocado = true;
               return DrawerHeader(
                 child: Container(
+                  alignment: Alignment.center,
                   child: Text(
                     'MENU',
-                    style: TextStyle(color: colorFuenteSecundario),
+                    style: TextStyle(
+                      color: Colors.white24,
+                      fontSize: 32,
+                    ),
                   ),
                 ),
               );
             } else {
-              return Slider(
-                key: Key('$index'),
-                activeColor: Colors.grey.withOpacity(0.60),
-                inactiveColor: Colors.grey.withOpacity(0.60),
-                max: 4.0,
-                min: 0.0,
-                value: blurValors[index],
-                onChanged: (nuevoBlurvalor) {
-                  setState(() {
-                    blurValors[index] = nuevoBlurvalor;
-                    imagenColocada = false;
-                    drawerColocado = false;
-                    print('valor: ${blurValors[index]}');
-                  });
-                },
+              return Column(
+                children: <Widget>[
+                  Container(
+                    padding: EdgeInsets.only(top: 24, left: 16),
+                    child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Icon(
+                          Icons.face,
+                          color: colorFuentePrincipal.withOpacity(0.5),
+                        )),
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 8),
+                    child: Slider(
+                      key: Key('$index'),
+                      activeColor: colorFuenteSecundario,
+                      inactiveColor: colorFuenteSecundario,
+                      max: 4.0,
+                      min: 0.0,
+                      value: blurValors[index],
+                      onChanged: (nuevoBlurvalor) {
+                        setState(() {
+                          blurValors[index] = nuevoBlurvalor;
+                          imagenColocada = false;
+                          drawerColocado = false;
+                          print('valor: ${blurValors[index]}');
+                        });
+                      },
+                    ),
+                  ),
+                ],
               );
             }
           }),
         ),
       ),
       body: Container(
+        alignment: Alignment.center,
         width: double.infinity,
         height: double.infinity,
-        color:colorFondo,
+        color: colorFondo,
         child: Center(
-          child: Stack(
-            children: List.generate(faces.length + 1, (index) {
-              if (!imagenColocada) {
-                imagenColocada = true;
-                return Image.file(
-                  imageFile,
-                );
-              } else {
-                final pos = faces[index - 1].boundingBox;
-                final anchoDeCara = pos.right.toDouble() - pos.left.toDouble();
-                final altoDeCara = pos.bottom.toDouble() - pos.top.toDouble();
-                return Positioned(
-                  key: Key('$index'),
-                  left: pos.left.toDouble() * 0.85,
-                  top: pos.top.toDouble() * 0.8,
-                  child: Container(
-                    width: anchoDeCara,
-                    height: altoDeCara * 1.18,
-                    child: Stack(
-                      children: <Widget>[
-                        Center(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(25.0),
-                            child: BackdropFilter(
-                              filter: prefix0.ImageFilter.blur(
-                                  sigmaX: blurValors[index],
-                                  sigmaY: blurValors[index]),
-                              child: new Container(
-                                width: 100,
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade200.withOpacity(0),
+          child: FittedBox(
+            child: SizedBox(
+              width: 432,
+              height: 576,
+              child: Stack(
+                children: List.generate(faces.length + 1, (index) {
+                  if (!imagenColocada) {
+                    imagenColocada = true;
+                    return Image.file(
+                      imageFile,
+                    );
+                  } else {
+                    final pos = faces[index - 1].boundingBox;
+                    final anchoDeCara =
+                        pos.right.toDouble() - pos.left.toDouble();
+                    final altoDeCara =
+                        pos.bottom.toDouble() - pos.top.toDouble();
+                    return Positioned(
+                      key: Key('$index'),
+                      left: pos.left.toDouble(),
+                      top: pos.top.toDouble(),
+                      child: Container(
+                        width: anchoDeCara,
+                        height: altoDeCara,
+                        child: Stack(
+                          children: <Widget>[
+                            Center(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(25.0),
+                                child: BackdropFilter(
+                                  filter: prefix0.ImageFilter.blur(
+                                      sigmaX: blurValors[index],
+                                      sigmaY: blurValors[index]),
+                                  child: new Container(
+                                    width: 200,
+                                    height: 200,
+                                    decoration: BoxDecoration(
+                                      color:
+                                          Colors.grey.shade200.withOpacity(0),
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                );
-              }
-            }),
+                      ),
+                    );
+                  }
+                }),
+              ),
+            ),
           ),
         ),
       ),
