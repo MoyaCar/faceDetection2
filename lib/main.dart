@@ -54,8 +54,8 @@ class HomeWidgetState extends State<HomeWidget> {
     //el procesado más certero.
     final imageFilex = await ImagePicker.pickImage(
       source: ImageSource.gallery,
-      maxHeight: 576,
-      maxWidth: 432,
+      maxHeight: 1280,
+      maxWidth: 1280,
     );
 
     //Envía la imagen a la IA engargada de detectar los rostros
@@ -105,7 +105,7 @@ class HomeWidgetState extends State<HomeWidget> {
               width: 260,
               padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
               child: Text(
-                'Una forma simple para difuminar rostros en fotografias',
+                'Una forma simple para difuminar rostros en fotografías',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 18,
@@ -143,25 +143,27 @@ class ImageAndFaces extends StatefulWidget {
 // Vista de destino con la imagen Procesada y la Lista de rostros
 class ImageAndFacesState extends State<ImageAndFaces> {
   ScreenshotController screenShootController = ScreenshotController();
+
+  ImageAndFacesState(this.imageFile, this.faces);
+
   final File imageFile;
   final List<Face> faces;
-
   List<double> blurValors = [2.0];
+
+  bool valoresInicialesAgregados = false;
+  bool imagenColocada = false;
+  bool drawerColocado = false;
+
   void contarRostros() {
     if (!valoresInicialesAgregados) {
       for (var i = 0; i < faces.length; i++) {
-        blurValors.add(2.0);
+        blurValors.add(4.0);
       }
       print('ACAAAAA!!!: $blurValors');
       valoresInicialesAgregados = true;
     }
   }
 
-  double blurvalor = 2.0;
-  ImageAndFacesState(this.imageFile, this.faces);
-  bool valoresInicialesAgregados = false;
-  bool imagenColocada = false;
-  bool drawerColocado = false;
   @override
   Widget build(BuildContext context) {
     contarRostros();
@@ -178,7 +180,7 @@ class ImageAndFacesState extends State<ImageAndFaces> {
                 child: Container(
                   alignment: Alignment.center,
                   child: Text(
-                    'MENU',
+                    '',
                     style: TextStyle(
                       color: Colors.white24,
                       fontSize: 32,
@@ -204,7 +206,7 @@ class ImageAndFacesState extends State<ImageAndFaces> {
                       key: Key('$index'),
                       activeColor: colorFuenteSecundario,
                       inactiveColor: colorFuenteSecundario,
-                      max: 4.0,
+                      max: 8.0,
                       min: 0.0,
                       value: blurValors[index],
                       onChanged: (nuevoBlurvalor) {
@@ -224,61 +226,62 @@ class ImageAndFacesState extends State<ImageAndFaces> {
         ),
       ),
       body: Container(
-        alignment: Alignment.center,
         width: double.infinity,
         height: double.infinity,
         color: colorFondo,
         child: Center(
           child: FittedBox(
             child: SizedBox(
-              width: 432,
-              height: 576,
-              child: Stack(
-                children: List.generate(faces.length + 1, (index) {
-                  if (!imagenColocada) {
-                    imagenColocada = true;
-                    return Image.file(
-                      imageFile,
-                    );
-                  } else {
-                    final pos = faces[index - 1].boundingBox;
-                    final anchoDeCara =
-                        pos.right.toDouble() - pos.left.toDouble();
-                    final altoDeCara =
-                        pos.bottom.toDouble() - pos.top.toDouble();
-                    return Positioned(
-                      key: Key('$index'),
-                      left: pos.left.toDouble(),
-                      top: pos.top.toDouble(),
-                      child: Container(
-                        width: anchoDeCara,
-                        height: altoDeCara,
-                        child: Stack(
-                          children: <Widget>[
-                            Center(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(25.0),
-                                child: BackdropFilter(
-                                  filter: prefix0.ImageFilter.blur(
-                                      sigmaX: blurValors[index],
-                                      sigmaY: blurValors[index]),
-                                  child: new Container(
-                                    width: 200,
-                                    height: 200,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Colors.grey.shade200.withOpacity(0),
+              width: 1280,
+              height: 1280,
+              child: Center(
+                child: Stack(
+                  children: List.generate(faces.length + 1, (index) {
+                    if (!imagenColocada) {
+                      imagenColocada = true;
+                      return Image.file(
+                        imageFile,
+                      );
+                    } else {
+                      final pos = faces[index - 1].boundingBox;
+                      final anchoDeCara =
+                          pos.right.toDouble() - pos.left.toDouble();
+                      final altoDeCara =
+                          pos.bottom.toDouble() - pos.top.toDouble();
+                      return Positioned(
+                        key: Key('$index'),
+                        left: pos.left.toDouble(),
+                        top: pos.top.toDouble(),
+                        child: Container(
+                          width: anchoDeCara,
+                          height: altoDeCara,
+                          child: Stack(
+                            children: <Widget>[
+                              Center(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(50.0),
+                                  child: BackdropFilter(
+                                    filter: prefix0.ImageFilter.blur(
+                                        sigmaX: blurValors[index],
+                                        sigmaY: blurValors[index]),
+                                    child: new Container(
+                                      width: 250,
+                                      height: 250,
+                                      decoration: BoxDecoration(
+                                        color:
+                                            Colors.grey.shade200.withOpacity(0),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    );
-                  }
-                }),
+                      );
+                    }
+                  }),
+                ),
               ),
             ),
           ),
@@ -293,7 +296,7 @@ class NoImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Text('NO DATA!'),
+        child: Text('No encuentro rostros!'),
       ),
     );
   }
