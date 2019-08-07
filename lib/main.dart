@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'DancingScript',
         canvasColor: colorFuentePrincipal.withOpacity(0.08),
@@ -170,6 +171,11 @@ class ImageAndFacesState extends State<ImageAndFaces> {
     //variable para conseguir las posiciones del primer rostro
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){},
+        backgroundColor:colorFuentePrincipal,
+        child: Icon(Icons.share,color: Colors.white,),
+      ),
       drawer: Drawer(
         elevation: 20,
         child: ListView(
@@ -225,67 +231,72 @@ class ImageAndFacesState extends State<ImageAndFaces> {
           }),
         ),
       ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        color: colorFondo,
-        child: Center(
-          child: FittedBox(
-            child: SizedBox(
-              width: 1280,
-              height: 1280,
-              child: Center(
-                child: Stack(
-                  children: List.generate(faces.length + 1, (index) {
-                    if (!imagenColocada) {
-                      imagenColocada = true;
-                      return Image.file(
-                        imageFile,
-                      );
-                    } else {
-                      final pos = faces[index - 1].boundingBox;
-                      final anchoDeCara =
-                          pos.right.toDouble() - pos.left.toDouble();
-                      final altoDeCara =
-                          pos.bottom.toDouble() - pos.top.toDouble();
-                      return Positioned(
-                        key: Key('$index'),
-                        left: pos.left.toDouble(),
-                        top: pos.top.toDouble(),
-                        child: Container(
-                          width: anchoDeCara,
-                          height: altoDeCara,
-                          child: Stack(
-                            children: <Widget>[
-                              Center(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(50.0),
-                                  child: BackdropFilter(
-                                    filter: prefix0.ImageFilter.blur(
-                                        sigmaX: blurValors[index],
-                                        sigmaY: blurValors[index]),
-                                    child: new Container(
-                                      width: 250,
-                                      height: 250,
-                                      decoration: BoxDecoration(
-                                        color:
-                                            Colors.grey.shade200.withOpacity(0),
+      body: Stack(
+        children: <Widget>[
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            color: colorFondo,
+            child: Center(
+              child: FittedBox(
+                child: SizedBox(
+                  width: 1280,
+                  height: 1280,
+                  child: Center(
+                    child: Stack(
+                      children: List.generate(faces.length + 1, (index) {
+                        if (!imagenColocada) {
+                          imagenColocada = true;
+                          return Image.file(
+                            imageFile,
+                          );
+                        } else {
+                          final pos = faces[index - 1].boundingBox;
+                          final anchoDeCara =
+                              pos.right.toDouble() - pos.left.toDouble();
+                          final altoDeCara =
+                              pos.bottom.toDouble() - pos.top.toDouble();
+                          return Positioned(
+                            key: Key('$index'),
+                            left: pos.left.toDouble(),
+                            top: pos.top.toDouble(),
+                            child: Container(
+                              width: anchoDeCara,
+                              height: altoDeCara,
+                              child: Stack(
+                                children: <Widget>[
+                                  Center(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50.0),
+                                      child: BackdropFilter(
+                                        filter: prefix0.ImageFilter.blur(
+                                            sigmaX: blurValors[index],
+                                            sigmaY: blurValors[index]),
+                                        child: new Container(
+                                          width: 250,
+                                          height: 250,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey.shade200
+                                                .withOpacity(0),
+                                          ),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                  }),
+                            ),
+                          );
+                        }
+                      }),
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+          DrawerMenuIcon(),
+        ],
       ),
     );
   }
@@ -299,5 +310,84 @@ class NoImage extends StatelessWidget {
         child: Text('No encuentro rostros!'),
       ),
     );
+  }
+}
+
+class DrawerMenuIcon extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return DrawerMenuIconState();
+  }
+}
+
+class DrawerMenuIconState extends State<DrawerMenuIcon>
+    with SingleTickerProviderStateMixin {
+  AnimationController _controlador;
+  Animation<double> _animacion;
+
+  animacionLoop() {
+    if (_animacion.isDismissed) {
+      _controlador.forward();
+    }
+    if (_animacion.isCompleted) {
+      _controlador.reverse();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controlador = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 1),
+    );
+    _animacion = Tween<double>(begin: 0, end: 0.8).animate(_controlador)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _controlador.reverse();
+        }
+        if (status == AnimationStatus.dismissed) {
+          _controlador.forward();
+        }
+        print("${_animacion.value}");
+      })..addListener((){setState(() {
+        
+      });});
+    _controlador.forward();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+        onTap: () {
+          Scaffold.of(context).openDrawer();
+        },
+        child: Stack(
+          children: <Widget>[
+            Container(
+              width: 50,
+              height: 50,
+              padding: EdgeInsets.only(top: 24,left: 8),
+              child: Icon(
+                Icons.face,
+                size: 40,
+                color: colorFuenteSecundario,
+              ),
+            ),
+            ClipRect(
+              child: BackdropFilter(
+                filter: prefix0.ImageFilter.blur(
+                  sigmaX: _animacion.value,
+                  sigmaY: _animacion.value,
+                ),
+                child: Container(
+                    width: 100, height: 100, color: Colors.transparent),
+              ),
+            ),
+            Container(
+              color: Colors.transparent,
+            )
+          ],
+        ));
   }
 }
