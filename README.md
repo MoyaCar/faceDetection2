@@ -1,7 +1,6 @@
 # Blured:
 
 
--Una forma simple de difuminar rostros en fotografías.
 
 
 -Aplicación para difuminar automátiamente rostros en fotos.
