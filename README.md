@@ -1,30 +1,31 @@
 # Blured:
 
-Una forma simple de difuminar rostros en fotografías.
+
+-Una forma simple de difuminar rostros en fotografías.
 
 
-Aplicación para difuminar automátiamente rostros en fotos.
-
- 
-
-Reconoce cantidad de rostros en foto y asigna un control unico a cada uno.
+-Aplicación para difuminar automátiamente rostros en fotos.
 
  
 
-Utiliza Machine Learning Kit de Google.
+-Reconoce cantidad de rostros en foto y asigna un control unico a cada uno.
 
  
 
-Conecta con FireBase.
+-Utiliza Machine Learning Kit de Google.
 
  
 
-Realziada con Flutter utilizando Dart.
+-Conecta con FireBase.
 
  
 
-Android e IOS compatible.
+-Realziada con Flutter utilizando Dart.
 
  
 
-Utiliza Material Design.
+-Android e IOS compatible.
+
+ 
+
+-Utiliza Material Design.
